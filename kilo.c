@@ -36,6 +36,9 @@ void enableRawMode() {
   //They are read as 13 and 10 respectively
   raw.c_iflag &= ~(ICRNL | IXON);   
   raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+  // Step 13 
+  // turnoff output processing
+  raw.c_oflag = ~(OPOST);
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); 
 
 }
