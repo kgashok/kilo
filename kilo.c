@@ -48,11 +48,10 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
-#include <sys/time.h>
+#include <time.h>
 #include <unistd.h>
 #include <stdarg.h>
 #include <fcntl.h>
-#include <time.h>
 
 /* Syntax highlight types */
 #define HL_NORMAL 0
