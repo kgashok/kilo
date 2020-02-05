@@ -35,10 +35,10 @@ void enableRawMode() {
   //Disable Ctrl-M and Ctrl-J
   //They are read as 13 and 10 respectively
   // Step 15 - turn off more flags
-raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-// Step 15 
-raw.c_cflag |= (CS8);
-raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+  // Step 15 
+  raw.c_cflag |= (CS8);
+  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
   // Step 13 
   // turnoff output processing
   // turnoff POST processing of outputs
@@ -49,7 +49,6 @@ raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
   raw.c_cc[VTIME] = 1;
 
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); 
-
 }
 
 int main() { 
