@@ -24,5 +24,5 @@ People are encouraged to use it as a starting point to write other editors
 or command line interfaces that are more advanced than the usual REPL
 style CLI.
 
-Kilo was written by Salvatore Sanfilippo aka antirez and is released
+Kilo was written by [Salvatore Sanfilippo](http://github.com/antirez) and is released
 under the BSD 2 clause license.
