@@ -1,3 +1,5 @@
+[![Run on Repl.it](https://repl.it/badge/github/kgashok/kilo)](https://repl.it/github/kgashok/kilo)
+
 Kilo
 ===
 
