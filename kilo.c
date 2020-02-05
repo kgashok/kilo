@@ -34,8 +34,11 @@ void enableRawMode() {
   // Step 12
   //Disable Ctrl-M and Ctrl-J
   //They are read as 13 and 10 respectively
-  raw.c_iflag &= ~(ICRNL | IXON);   
-  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+  // Step 15 - turn off more flags
+raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+// Step 15 
+raw.c_cflag |= (CS8);
+raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
   // Step 13 
   // turnoff output processing
   // turnoff POST processing of outputs
