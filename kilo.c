@@ -29,8 +29,13 @@ void enableRawMode() {
   // Step 10
   //Disable Ctrl-S and Ctrl-Q
   //They are read as 19 and 17 respectively
-  raw.c_iflag &= ~(IXON);   
-  raw.c_lflag &= ~(ECHO | ICANON | ISIG);
+  // Step 11 
+  //Disable Ctrl-V and Ctrl-O
+  // Step 12
+  //Disable Ctrl-M and Ctrl-J
+  //They are read as 13 and 10 respectively
+  raw.c_iflag &= ~(ICRNL | IXON);   
+  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); 
 
 }
