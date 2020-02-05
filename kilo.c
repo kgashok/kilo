@@ -1,4 +1,8 @@
+/*** links ***/ 
+
 //https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
+
+/*** includes ***/ 
 
 #include <ctype.h>
 #include <errno.h>
@@ -7,12 +11,16 @@
 #include <termios.h> 
 #include <unistd.h>
 
+/*** data ***/ 
 struct termios orig_termios;
+
+/*** terminal ***/ 
 
 void die(const char *s) {
   perror(s);
   exit(1);
 }
+
 void disableRawMode() {
   if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
     die("tcsetattr");
@@ -65,6 +73,8 @@ void enableRawMode() {
   // something like Inappropriate ioctl for device.
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr"); 
 }
+
+/*** init ***/
 
 int main() { 
   enableRawMode(); 
