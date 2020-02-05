@@ -54,6 +54,15 @@ void enableRawMode() {
   raw.c_cc[VMIN] = 0; 
   raw.c_cc[VTIME] = 1;
 
+  // Step 18 - testing
+  // An easy way to make tcgetattr() fail is to 
+  // give your program a text file or a pipe as 
+  // the standard input instead of your terminal. 
+  // To give it a file as standard input, 
+  // run ./kilo <kilo.c. To give it a pipe, 
+  // run echo test | ./kilo. Both should result 
+  // in the same error from tcgetattr(), 
+  // something like Inappropriate ioctl for device.
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr"); 
 }
 
