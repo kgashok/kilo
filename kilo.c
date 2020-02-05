@@ -1,6 +1,7 @@
 //https://viewsourcecode.org/snaptoken/kilo/02.enteringRawMode.html
 
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h> 
@@ -13,13 +14,14 @@ void die(const char *s) {
   exit(1);
 }
 void disableRawMode() {
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+  if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
+    die("tcsetattr");
   printf("Quitting after disabling raw mode!\n");
 
 }
 
 void enableRawMode() { 
-  tcgetattr(STDIN_FILENO, &orig_termios);
+  if(tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
 
   //We use it to register our disableRawMode() function to be called automatically when the program exits, whether it exits by returning from main(), or by calling the exit() function 
   atexit(disableRawMode);
@@ -52,7 +54,7 @@ void enableRawMode() {
   raw.c_cc[VMIN] = 0; 
   raw.c_cc[VTIME] = 1;
 
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); 
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr"); 
 }
 
 int main() { 
@@ -60,7 +62,8 @@ int main() {
 
   while (1) { 
     char c = '\0'; 
-    read(STDIN_FILENO, &c, 1);
+    if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) die("read");
+  
     // is a control character?
     if (iscntrl(c)) {
       // because OPOST has been enabled
