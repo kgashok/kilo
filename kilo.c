@@ -38,6 +38,8 @@ void enableRawMode() {
   raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
   // Step 13 
   // turnoff output processing
+  // turnoff POST processing of outputs
+  //From now on, we’ll have to write out the full "\r\n" whenever we want to start a new line.
   raw.c_oflag = ~(OPOST);
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); 
 
@@ -50,7 +52,8 @@ int main() {
   while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q') {
     // is a control character?
     if (iscntrl(c)) {
-      printf("%d\n", c);
+      // because OPOST has been enabled
+      printf("%d\r\n", c);
     } else {
       printf("%d ('%c')\n", c, c);
     }
