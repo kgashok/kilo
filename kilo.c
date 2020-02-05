@@ -26,8 +26,11 @@ void enableRawMode() {
   //There is an ICANON flag that allows us to turn off canonical mode. This means we will finally be reading input byte-by-byte, instead of line-by-line.
   // Step 9
   //Disable Ctrl-C and Ctrl-Z using ISIG
+  // Step 10
+  //Disable Ctrl-S and Ctrl-Q
+  //They are read as 19 and 17 respectively
+  raw.c_iflag &= ~(IXON);   
   raw.c_lflag &= ~(ECHO | ICANON | ISIG);
-
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); 
 
 }
