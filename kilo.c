@@ -190,14 +190,14 @@ void abFree(struct abuf *ab) {
 // editorDrawRows() will handle drawing each row of the buffer of text being
 // edited. For now it draws a tilde in each row, which means that row is not
 // part of the file and can’t contain any text.
-void editorDrawRows() {
+void editorDrawRows(struct abuf *ab) {
   int y;
   for (y = 0; y < E.screenrows; y++) {
-    write(STDOUT_FILENO, "~", 1);
+    abAppend(ab, "~", 1);
 
     // Step 35 bug fixed for last line
     if (y < E.screenrows - 1) {
-      write(STDOUT_FILENO, "\r\n", 2);
+      abAppend(ab, "\r\n", 2);
     }
   }
 }
@@ -219,11 +219,17 @@ void editorDrawRows() {
 // argument for J, so just <esc>[J by itself would also clear the screen from
 // the cursor to the end.
 void editorRefreshScreen() {
+  struct abuf ab = ABUF_INIT;
+
   write(STDOUT_FILENO, "\x1b[2J", 4);
   write(STDOUT_FILENO, "\x1b[H", 3);
 
-  editorDrawRows();
-  write(STDOUT_FILENO, "\x1b[H", 3);
+  editorDrawRows(&ab);
+
+  abAppend(&ab, "\x1b[H", 3);
+  
+  write(STDOUT_FILENO, ab.b, ab.len);
+  abFree(&ab);
 }
 
 /*** input ***/
