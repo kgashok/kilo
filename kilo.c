@@ -262,6 +262,23 @@ void editorRefreshScreen() {
 
 /*** input ***/
 
+void editorMoveCursor(char key) {
+  switch (key) {
+    case 'a':
+      E.cx--;
+      break;
+    case 'd':
+      E.cx++;
+      break;
+    case 'w':
+      E.cy--;
+      break;
+    case 's':
+      E.cy++;
+      break;
+  }
+}
+
 // editorProcessKeypress() waits for a keypress, and then handles it. Later, it
 // will map various Ctrl key combinations and other special keys to different
 // editor functions, and insert any alphanumeric and other printable keys’
@@ -274,6 +291,13 @@ void editorProcessKeypress() {
     write(STDOUT_FILENO, "\x1b[2J", 4);
     write(STDOUT_FILENO, "\x1b[H", 3);
     exit(0);
+    break;
+
+  case 'w':
+  case 's':
+  case 'a':
+  case 'd':
+    editorMoveCursor(c);
     break;
   }
 }
