@@ -75,6 +75,7 @@ void enableRawMode() {
   // Disable Ctrl-C and Ctrl-Z using ISIG
   // Step 10
   // Disable Ctrl-S and Ctrl-Q
+
   // They are read as 19 and 17 respectively
   // Step 11
   // Disable Ctrl-V and Ctrl-O
@@ -109,12 +110,16 @@ void enableRawMode() {
     die("tcsetattr");
 }
 
-// editorReadKey()’s job is to wait for one keypress, and return it. Later, we’ll expand this function to handle escape sequences, which involves reading multiple bytes that represent a single keypress, as is the case with the arrow keys.
-char editorReadKey() { 
+// editorReadKey()’s job is to wait for one keypress, and return it. Later,
+// we’ll expand this function to handle escape sequences, which involves reading
+// multiple bytes that represent a single keypress, as is the case with the
+// arrow keys.
+char editorReadKey() {
   int nread;
   char c;
   while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
-    if (nread == -1 && errno != EAGAIN) die("read");
+    if (nread == -1 && errno != EAGAIN)
+      die("read");
   }
   return c;
 }
@@ -131,20 +136,33 @@ int getWindowSize(int *rows, int *cols) {
 }
 /*** output ***/
 
-// editorDrawRows() will handle drawing each row of the buffer of text being edited. For now it draws a tilde in each row, which means that row is not part of the file and can’t contain any text.
-void editorDrawRows(){
+// editorDrawRows() will handle drawing each row of the buffer of text being
+// edited. For now it draws a tilde in each row, which means that row is not
+// part of the file and can’t contain any text.
+void editorDrawRows() {
   int y;
   for (y = 0; y < E.screenrows; y++) {
     write(STDOUT_FILENO, "~\r\n", 3);
   }
 }
 
-// The 4 in our write() call means we are writing 4 bytes out to the terminal. The first byte is \x1b, which is the escape character, or 27 in decimal. (Try and remember \x1b, we will be using it a lot.) The other three bytes are [2J.
+// The 4 in our write() call means we are writing 4 bytes out to the terminal.
+// The first byte is \x1b, which is the escape character, or 27 in decimal. (Try
+// and remember \x1b, we will be using it a lot.) The other three bytes are [2J.
 //
-// We are writing an escape sequence to the terminal. Escape sequences always start with an escape character (27) followed by a [ character. Escape sequences instruct the terminal to do various text formatting tasks, such as coloring text, moving the cursor around, and clearing parts of the screen.
+// We are writing an escape sequence to the terminal. Escape sequences always
+// start with an escape character (27) followed by a [ character. Escape
+// sequences instruct the terminal to do various text formatting tasks, such as
+// coloring text, moving the cursor around, and clearing parts of the screen.
 //
-// We are using the J command (Erase In Display) to clear the screen. Escape sequence commands take arguments, which come before the command. In this case the argument is 2, which says to clear the entire screen. <esc>[1J would clear the screen up to where the cursor is, and <esc>[0J would clear the screen from the cursor up to the end of the screen. Also, 0 is the default argument for J, so just <esc>[J by itself would also clear the screen from the cursor to the end.
-void editorRefreshScreen() { 
+// We are using the J command (Erase In Display) to clear the screen. Escape
+// sequence commands take arguments, which come before the command. In this case
+// the argument is 2, which says to clear the entire screen. <esc>[1J would
+// clear the screen up to where the cursor is, and <esc>[0J would clear the
+// screen from the cursor up to the end of the screen. Also, 0 is the default
+// argument for J, so just <esc>[J by itself would also clear the screen from
+// the cursor to the end.
+void editorRefreshScreen() {
   write(STDOUT_FILENO, "\x1b[2J", 4);
   write(STDOUT_FILENO, "\x1b[H", 3);
 
@@ -152,25 +170,29 @@ void editorRefreshScreen() {
   write(STDOUT_FILENO, "\x1b[H", 3);
 }
 
-
 /*** input ***/
 
-// editorProcessKeypress() waits for a keypress, and then handles it. Later, it will map various Ctrl key combinations and other special keys to different editor functions, and insert any alphanumeric and other printable keys’ characters into the text that is being edited.
-void editorProcessKeypress() { 
+// editorProcessKeypress() waits for a keypress, and then handles it. Later, it
+// will map various Ctrl key combinations and other special keys to different
+// editor functions, and insert any alphanumeric and other printable keys’
+// characters into the text that is being edited.
+void editorProcessKeypress() {
   char c = editorReadKey();
 
-  switch(c) {
-    case CTRL_KEY('q'):
-      write(STDOUT_FILENO, "\x1b[2J", 4);
-      write(STDOUT_FILENO, "\x1b[H", 3);
-      exit(0);
-      break;
+  switch (c) {
+  case CTRL_KEY('q'):
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[H", 3);
+    exit(0);
+    break;
   }
 }
+
 /*** init ***/
 
 void initEditor() {
-  if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
+  if (getWindowSize(&E.screenrows, &E.screencols) == -1)
+    die("getWindowSize");
 }
 
 int main() {
