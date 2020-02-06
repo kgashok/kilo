@@ -28,7 +28,10 @@
 
 /*** data ***/
 
-struct termios orig_termios;
+struct editorConfig {
+  struct termios orig_termios;
+};
+struct editorConfig E;
 
 /*** terminal ***/
 
@@ -40,13 +43,13 @@ void die(const char *s) {
 }
 
 void disableRawMode() {
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1)
     die("tcsetattr");
   printf("Quitting after disabling raw mode!\n");
 }
 
 void enableRawMode() {
-  if (tcgetattr(STDIN_FILENO, &orig_termios) == -1)
+  if (tcgetattr(STDIN_FILENO, &E.orig_termios) == -1)
     die("tcgetattr");
 
   // We use it to register our disableRawMode() function to be called
@@ -54,7 +57,7 @@ void enableRawMode() {
   // main(), or by calling the exit() function
   atexit(disableRawMode);
 
-  struct termios raw = orig_termios;
+  struct termios raw = E.orig_termios;
   // ECHO is a bitflag, defined as 00000000000000000000000000001000 in binary.
   // We use the bitwise-NOT operator (~) on this value to get
   // 11111111111111111111111111110111. We then bitwise-AND this value with the
