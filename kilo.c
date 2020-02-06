@@ -197,6 +197,7 @@ void editorDrawRows(struct abuf *ab) {
   int y;
   for (y = 0; y < E.screenrows; y++) {
     if (y == E.screenrows / 3) {
+      // Step 41 
       char welcome[80]; 
       int welcomelen = snprintf(welcome, sizeof(welcome), 
         "Kilo editor -- version %s", KILO_VERSION);
