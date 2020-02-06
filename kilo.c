@@ -39,6 +39,7 @@ struct editorConfig {
   int screencols;
   struct termios orig_termios;
 };
+
 struct editorConfig E;
 
 /*** terminal ***/
@@ -169,13 +170,13 @@ int getWindowSize(int *rows, int *cols) {
 
 /*** append buffer ***/
 
-// Step 36 
+// Step 36 - declaring a buffer
 struct abuf {
   char *b;
   int len;
 };
 
-#define ABUF_INIT {NULL, 0}
+#define ABUF_INIT {NULL, 0}  // initializer for a buffer
 
 void abAppend(struct abuf *ab, const char *s, int len) {
   char *new = realloc(ab->b, ab->len + len);
