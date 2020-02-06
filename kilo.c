@@ -163,6 +163,8 @@ int getWindowSize(int *rows, int *cols) {
 }
 
 /*** append buffer ***/
+
+// Step 36 
 struct abuf {
   char *b;
   int len;
