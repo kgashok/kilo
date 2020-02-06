@@ -30,6 +30,8 @@
 /*** data ***/
 
 struct editorConfig {
+  int screenrows;
+  int screencols;
   struct termios orig_termios;
 };
 struct editorConfig E;
@@ -132,7 +134,7 @@ int getWindowSize(int *rows, int *cols) {
 // editorDrawRows() will handle drawing each row of the buffer of text being edited. For now it draws a tilde in each row, which means that row is not part of the file and can’t contain any text.
 void editorDrawRows(){
   int y;
-  for (y = 0; y < 24; y++) {
+  for (y = 0; y < E.screenrows; y++) {
     write(STDOUT_FILENO, "~\r\n", 3);
   }
 }
@@ -167,8 +169,13 @@ void editorProcessKeypress() {
 }
 /*** init ***/
 
+void initEditor() {
+  if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
+}
+
 int main() {
   enableRawMode();
+  initEditor();
 
   while (1) {
     editorRefreshScreen();
