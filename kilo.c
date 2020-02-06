@@ -254,7 +254,7 @@ void editorRefreshScreen() {
   snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
   abAppend(&ab, buf, strlen(buf));
 
-  abAppend(&ab, "\x1b[?25l", 6);
+  abAppend(&ab, "\x1b[?25h", 6);
 
   write(STDOUT_FILENO, ab.b, ab.len);
   abFree(&ab);
@@ -265,15 +265,19 @@ void editorRefreshScreen() {
 void editorMoveCursor(char key) {
   switch (key) {
     case 'a':
+    case 'h':
       E.cx--;
       break;
     case 'd':
+    case 'l':
       E.cx++;
       break;
     case 'w':
+    case 'k':
       E.cy--;
       break;
     case 's':
+    case 'j':
       E.cy++;
       break;
   }
@@ -297,6 +301,10 @@ void editorProcessKeypress() {
   case 's':
   case 'a':
   case 'd':
+  case 'j':
+  case 'k':
+  case 'l':
+  case 'h':
     editorMoveCursor(c);
     break;
   }
