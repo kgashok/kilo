@@ -16,6 +16,9 @@
 
 /*** defines ***/
 
+// Step 41
+#define KILO_VERSION "0.0.1"
+
 // The CTRL_KEY macro bitwise-ANDs a character with the value 00011111, in
 // binary. (In C, you generally specify bitmasks using hexadecimal, since C
 // doesn’t have binary literals, and hexadecimal is more concise and readable
@@ -193,7 +196,15 @@ void abFree(struct abuf *ab) {
 void editorDrawRows(struct abuf *ab) {
   int y;
   for (y = 0; y < E.screenrows; y++) {
-    abAppend(ab, "~", 1);
+    if (y == E.screenrows / 3) {
+      char welcome[80]; 
+      int welcomelen = snprintf(welcome, sizeof(welcome), 
+        "Kilo editor -- version %s", KILO_VERSION);
+      if (welcomelen > E.screencols) welcomelen = E.screencols;
+      abAppend(ab, welcome, welcomelen);
+    } else {
+      abAppend(ab, "~", 1);
+    }
 
     // Step 40 one at a time 
     abAppend(ab, "\x1b[K", 3);
