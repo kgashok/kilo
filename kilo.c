@@ -42,12 +42,25 @@ enum editorKey {
   PAGE_UP,   
   PAGE_DOWN
 };
+
 /*** data ***/
+
+// erow stands for “editor row”, and stores a line
+// of text as a pointer to the dynamically-allocated
+// character data and a length.
+// The typedef lets us refer to the type as erow
+// instead of struct erow.
+typedef struct erow {
+  int size;
+  char *chars;
+} erow;
 
 struct editorConfig {
   int cx, cy;
   int screenrows;
   int screencols;
+  int numrows;
+  erow rows;
   struct termios orig_termios;
 };
 
@@ -383,6 +396,8 @@ void initEditor() {
   // Step 43
   E.cx = 0; 
   E.cy = 0; 
+  E.numrows = 0;
+
   if (getWindowSize(&E.screenrows, &E.screencols) == -1)
     die("getWindowSize");
 }
