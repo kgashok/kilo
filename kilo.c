@@ -289,19 +289,20 @@ void editorMoveCursor(int key) {
   switch (key) {
     case ARROW_LEFT:
     case 'h':
-      E.cx--;
+      if (E.cx != 0) E.cx--;
       break;
     case ARROW_RIGHT:
     case 'l':
-      E.cx++;
+      if (E.cx != E.screencols - 1)      
+        E.cx++;
       break;
     case ARROW_UP:
     case 'k':
-      E.cy--;
+      if (E.cy != 0) E.cy--;
       break;
     case ARROW_DOWN:
     case 'j':
-      E.cy++;
+      if (E.cy != E.screenrows-1) E.cy++;
       break;
   }
 }
