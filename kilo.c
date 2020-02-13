@@ -407,6 +407,8 @@ void editorRefreshScreen() {
 /*** input ***/
 
 void editorMoveCursor(int key) {
+  erow *row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
+
   switch (key) {
     case ARROW_LEFT:
     case 'h':
@@ -417,7 +419,9 @@ void editorMoveCursor(int key) {
       // Step 74 - allow user to go pass the right edge of screen
       // and should be able to confirm horizontal scrolling works!
       //if (E.cx != E.screencols - 1)      
-      E.cx++;
+      // Step 76
+      if (row && E.cx < row->size) 
+        E.cx++;
       break;
     case ARROW_UP:
     case 'k':
@@ -428,8 +432,15 @@ void editorMoveCursor(int key) {
       // Step 69 - advance past bottom of screen but not file
       if (E.cy != E.numrows) E.cy++;
       //if (E.cy != E.screenrows-1) E.cy++;
+      // Step 77
       break;
   }
+
+  row = (E.cy >= E.numrows)? NULL : &E.row[E.cy]; 
+  int rowlen = row ? row->size : 0; 
+  if (E.cx > rowlen) 
+  E.cx = rowlen;
+  
 }
 
 // editorProcessKeypress() waits for a keypress, and then handles it. Later, it
