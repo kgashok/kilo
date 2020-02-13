@@ -14,9 +14,9 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
-#include <sys/ioctl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
@@ -78,6 +78,7 @@ struct editorConfig E;
 void die(const char *s) {
   write(STDOUT_FILENO, "\x1b[2J", 4);
   write(STDOUT_FILENO, "\x1b[H", 3);
+  
   perror(s);
   exit(1);
 }
@@ -160,6 +161,7 @@ int editorReadKey() {
   }
   if (c == '\x1b') {
     char seq[3];
+
     if (read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
     if (read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
 
@@ -193,6 +195,7 @@ int editorReadKey() {
         case 'F': return END_KEY;
       }
     }
+    
     return '\x1b';
   } else { 
     return c;
@@ -247,7 +250,7 @@ void editorAppendRow(char *s, size_t len) {
   E.row[at].chars = malloc(len + 1); 
   memcpy(E.row[at].chars, s, len); 
   E.row[at].chars[len] = '\0'; 
-  E.numrows = 1; 
+  E.numrows++; 
 
 }
 
@@ -260,12 +263,12 @@ void editorOpen(char *filename) {
     char *line = NULL;
     size_t linecap = 0; 
     ssize_t linelen;
-    linelen = getline(&line, &linecap, fp); 
-    if (linelen != -1){
-        while (linelen >0 && (line[linelen-1] == '\n' || 
+    // Step 65 - read in the whole file
+    while ((linelen = getline(&line, &linecap, fp)) != -1) {
+      while (linelen >0 && (line[linelen-1] == '\n' || 
                               line[linelen-1] == '\r'))
-            linelen--;
-        editorAppendRow(line, linelen);
+        linelen--;
+      editorAppendRow(line, linelen);
     }
     free(line);
     fclose(fp);
