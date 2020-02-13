@@ -412,7 +412,12 @@ void editorMoveCursor(int key) {
   switch (key) {
     case ARROW_LEFT:
     case 'h':
-      if (E.cx != 0) E.cx--;
+      if (E.cx != 0) {
+        E.cx--;
+      } else if (E.cy > 0) {
+        E.cy--;
+        E.cx = E.row[E.cy].size;
+      }
       break;
     case ARROW_RIGHT:
     case 'l':
@@ -420,8 +425,12 @@ void editorMoveCursor(int key) {
       // and should be able to confirm horizontal scrolling works!
       //if (E.cx != E.screencols - 1)      
       // Step 76
-      if (row && E.cx < row->size) 
+      if (row && E.cx < row->size) {
         E.cx++;
+      } else if (row && E.cx == row->size) {
+        E.cy++;
+        E.cx = 0;
+      }
       break;
     case ARROW_UP:
     case 'k':
@@ -439,8 +448,8 @@ void editorMoveCursor(int key) {
   row = (E.cy >= E.numrows)? NULL : &E.row[E.cy]; 
   int rowlen = row ? row->size : 0; 
   if (E.cx > rowlen) 
-  E.cx = rowlen;
-  
+    E.cx = rowlen;
+
 }
 
 // editorProcessKeypress() waits for a keypress, and then handles it. Later, it
