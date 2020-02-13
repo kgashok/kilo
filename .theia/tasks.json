@@ -6,7 +6,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "sleep 1 && make",
+            "command": "sleep 1 && make && ./kilo kilo.c",
             "problemMatcher": []
         }
     ]
