@@ -279,7 +279,7 @@ void editorUpdateRow(erow *row) {
         }
     }
     row->render[idx] = '\0';
-    row->size = idx;
+    row->rsize = idx;
 }
 
 void editorAppendRow(char *s, size_t len) { 
@@ -435,6 +435,7 @@ void editorDrawRows(struct abuf *ab) {
 // the cursor to the end.
 void editorRefreshScreen() {
   editorScroll();
+  
   struct abuf ab = ABUF_INIT;
 
   abAppend(&ab, "\x1b[?25l", 6);
@@ -491,7 +492,7 @@ void editorMoveCursor(int key) {
     case ARROW_DOWN:
     case 'j':
       // Step 69 - advance past bottom of screen but not file
-      if (E.cy != E.numrows) E.cy++;
+      if (E.cy < E.numrows) E.cy++;
       //if (E.cy != E.screenrows-1) E.cy++;
       // Step 77
       break;
@@ -521,7 +522,7 @@ void editorProcessKeypress() {
   case HOME_KEY:
     E.cx = 0;
     break;
-    
+
   case END_KEY:
     E.cx = E.screencols - 1;
     break;
