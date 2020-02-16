@@ -26,6 +26,7 @@
 
 // Step 41
 #define KILO_VERSION "0.0.1"
+#define KILO_TAB_STOP 8
 
 // The CTRL_KEY macro bitwise-ANDs a character with the value 00011111, in
 // binary. (In C, you generally specify bitmasks using hexadecimal, since C
@@ -67,6 +68,7 @@ typedef struct erow {
 
 struct editorConfig {
   int cx, cy;
+  int rx;
   int rowoff;
   int coloff; 
   int screenrows;
@@ -247,14 +249,34 @@ int getWindowSize(int *rows, int *cols) {
 
 /*** row operations ***/ 
 
-void editorUpdateRow(erow *row) { 
-    free(row->render);
-    row->render = malloc(row->size + 1);
+int editorRowCxToRx(erow *row, int cx) {
+  int rx = 0;
+  int j;
+  for (j = 0; j < cx; j++) { 
+    if (row->chars[j] == '\t')
+      rx += (KILO_TAB_STOP - 1) - (rx % KILO_TAB_STOP);
+    rx++;
+  }
+  return rx;
+}
 
+void editorUpdateRow(erow *row) { 
+    int tabs = 0;
     int j;
+    for (j = 0; j < row->size; j++)
+      if (row->chars[j] == '\t') tabs++;
+
+    free(row->render);
+    row->render = malloc(row->size + tabs*(KILO_TAB_STOP - 1) + 1);
+
     int idx = 0; 
     for (j = 0; j < row->size; j++) { 
-        row-> render[idx++] = row->chars[j];
+        if (row->chars[j] == '\t') {
+          row->render[idx++] = ' '; 
+          while( idx % KILO_TAB_STOP != 0) row->render[idx++] = ' ';
+        } else {
+          row-> render[idx++] = row->chars[j];
+        }
     }
     row->render[idx] = '\0';
     row->size = idx;
@@ -272,7 +294,7 @@ void editorAppendRow(char *s, size_t len) {
   E.row[at].rsize = 0; 
   E.row[at].render = NULL;
   editorUpdateRow(&E.row[at]);
-  
+
   E.numrows++; 
 
 }
@@ -309,6 +331,7 @@ struct abuf {
 
 void abAppend(struct abuf *ab, const char *s, int len) {
   char *new = realloc(ab->b, ab->len + len);
+
   if (new == NULL) return;
   memcpy(&new[ab->len], s, len);
   ab->b = new;
@@ -323,8 +346,15 @@ void abFree(struct abuf *ab) {
 
 // Step 68
 void editorScroll() { 
+  E.rx = 0;
+
+  // Step 89
+  if (E.cy < E.numrows) { 
+    E.rx = editorRowCxToRx(&E.row[E.cy], E.cx);
+  }
+
   if (E.cy < E.rowoff) { 
-    E.rowoff = E.cy;
+      E.rowoff = E.cy;
   }
   if (E.cy >= E.rowoff + E.screenrows) { 
     E.rowoff = E.cy - E.screenrows + 1;
@@ -333,12 +363,14 @@ void editorScroll() {
   // Exact parallel to vertical scrolling mode
   // E.cx <= E.cy 
   // E.rowoff <= E.coloff
-  // E.screenrows <= E.screencols 
-  if (E.cx < E.coloff) { 
-      E.coloff = E.cx; 
+  // E.screenrows <= E.screencols
+
+  // Step 86 
+  if (E.rx < E.coloff) { 
+      E.coloff = E.rx; 
   }
-  if (E.cx >= E.coloff + E.screencols) {
-      E.coloff = E.cx + E.screencols + 1;
+  if (E.rx >= E.coloff + E.screencols) {
+      E.coloff = E.rx - E.screencols + 1;
   }
 }
 
@@ -369,10 +401,10 @@ void editorDrawRows(struct abuf *ab) {
         abAppend(ab, "~", 1);
         }
     } else {
-        int len = E.row[filerow].size - E.coloff;
+        int len = E.row[filerow].rsize - E.coloff;
         if (len < 0) len = 0;
         if (len > E.screencols) len = E.screencols; 
-        abAppend(ab, &E.row[filerow].chars[E.coloff], len);
+        abAppend(ab, &E.row[filerow].render[E.coloff], len);
     }
 
     // Step 40 one at a time 
@@ -415,7 +447,7 @@ void editorRefreshScreen() {
   // Step 70 - to fix cursor scrolling on the screen
   //snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
   snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, 
-                                            (E.cx - E.coloff) + 1);
+                                            (E.rx - E.coloff) + 1);
   abAppend(&ab, buf, strlen(buf));
 
   abAppend(&ab, "\x1b[?25h", 6);
@@ -489,6 +521,7 @@ void editorProcessKeypress() {
   case HOME_KEY:
     E.cx = 0;
     break;
+    
   case END_KEY:
     E.cx = E.screencols - 1;
     break;
@@ -521,6 +554,7 @@ void initEditor() {
   // Step 43
   E.cx = 0; 
   E.cy = 0;
+  E.rx = 0;
   E.rowoff = 0; 
   E.coloff = 0;
   E.numrows = 0;
