@@ -8,5 +8,6 @@
             "name": "",
             "directory": ""
         }
-    ]
+    ],
+    "editor.autoSave": "on"
 }
